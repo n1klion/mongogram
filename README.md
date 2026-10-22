@@ -146,16 +146,20 @@ git switch -c feature/something
 # work, commit, push, open a pull request into develop
 ```
 
-To release, cut a branch named after the version from `develop` and open a pull request into `main`:
+To release, once `develop` is tested, open **Actions → Start release → Run workflow**. Pick `patch`, `minor`
+or `major` (counted from the last `vX.Y.Z` tag), or type an exact version such as `1.0.0-beta.1`.
+`.github/workflows/start-release.yml` then:
 
-```sh
-git switch develop && git pull
-git switch -c release/v0.2.0
-git push -u origin release/v0.2.0
-# open the pull request into main and merge it
-```
+1. stops unless the `build` check passed on the latest `develop` commit (`allow_untested` overrides this);
+2. creates `release/vX.Y.Z` at that commit;
+3. opens the pull request into `main`, listing the commits since the last release;
+4. starts the `source` check on the new branch. A pull request opened by a workflow doesn't trigger other
+   workflows. `build` already passed on this exact commit, on `develop`.
 
-Merging it runs `.github/workflows/release-publish.yml`. That workflow tags the merge commit `v0.2.0` and builds
+It needs **Settings → Actions → General → Allow GitHub Actions to create and approve pull requests**.
+You can still create a `release/vX.Y.Z` branch by hand and open the pull request yourself.
+
+Merging the pull request runs `.github/workflows/release-publish.yml`. That workflow tags the merge commit `vX.Y.Z` and builds
 the app. It then publishes a GitHub Release with the zip and generated notes, and deletes the branch.
 Versions starting with `0.` and versions with a suffix (`v1.0.0-beta.1`) are published as **pre-releases**.
 

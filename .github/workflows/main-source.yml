@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [main]
     types: [opened, reopened, synchronize, edited]
+  # start-release.yml runs this on the branch it creates: its pull request doesn't trigger workflows.
+  workflow_dispatch:
 
 jobs:
   source:
@@ -13,8 +15,8 @@ jobs:
     steps:
       - name: Check the source branch
         env:
-          HEAD: ${{ github.event.pull_request.head.ref }}
-          SAME_REPO: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+          HEAD: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || github.ref_name }}
+          SAME_REPO: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
         run: |
           if [[ "$SAME_REPO" != "true" ]]; then
             echo "::error::Pull requests into main must come from a branch of this repository"; exit 1
