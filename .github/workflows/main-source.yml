@@ -1,0 +1,25 @@
+name: Main source
+
+# main only takes tested work: pull requests from develop, a release/vX.Y.Z branch cut from develop,
+# or a hotfix/* branch. Make the "source" check required for main so anything else can't be merged.
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, synchronize, edited]
+
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the source branch
+        env:
+          HEAD: ${{ github.event.pull_request.head.ref }}
+          SAME_REPO: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+        run: |
+          if [[ "$SAME_REPO" != "true" ]]; then
+            echo "::error::Pull requests into main must come from a branch of this repository"; exit 1
+          fi
+          case "$HEAD" in
+            develop|release/v*|hotfix/*) echo "OK: $HEAD -> main" ;;
+            *) echo "::error::main takes pull requests from develop, release/vX.Y.Z or hotfix/* only, not '$HEAD'. Open this one against develop."; exit 1 ;;
+          esac
