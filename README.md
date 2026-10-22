@@ -58,7 +58,18 @@ Moon Modeler, with the same widths and colors.
 
 ## Install
 
-Build it from source (below), then move `build/MongoGram.app` to `/Applications`, or run
+Download `MongoGram-X.Y.Z.zip` from [Releases](https://github.com/n1klion/mongogram/releases), unzip it
+and move `MongoGram.app` to `/Applications`. It runs on Apple Silicon and Intel Macs.
+
+The app isn't notarized by Apple, so the first launch is blocked. Right-click the app → **Open** → **Open**,
+or on newer macOS use **System Settings → Privacy & Security → Open Anyway**. You can also clear the
+quarantine flag yourself:
+
+```sh
+xattr -dr com.apple.quarantine /Applications/MongoGram.app
+```
+
+Or build it from source (below), then move `build/MongoGram.app` to `/Applications`, or run
 `scripts/build-app.sh --install`.
 
 MongoGram registers as an **alternate** app for `.dmm`, so Moon Modeler stays the default. Use
